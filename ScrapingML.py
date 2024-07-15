@@ -24,6 +24,8 @@ class ScrapingML:
         self.tituloBusqueda = ""
         self.precios = []
         self.precioPromedio = 0
+        self.mediana = 0
+        self.desviacionEstandar = 0
 
     def getTituloBusqueda(self):
         return self.tituloBusqueda
@@ -70,6 +72,8 @@ class ScrapingML:
                     "Descripcion": descripcion
                 })
             self.calcularPrecioPromedio()
+            self.calcularMediana()
+            self.calcularDesviacionEstandar()
             return True
         else:
             return False
@@ -78,6 +82,18 @@ class ScrapingML:
             self.precioPromedio = sum(self.precios) / len(self.precios)
             #redondear a 2 decimales
             self.precioPromedio = round(self.precioPromedio, 2)
+            return True
+        else:
+            return False
+    def calcularMediana(self):
+        if len(self.precios) > 0:
+            self.mediana = self.precios[len(self.precios) // 2]
+            return True
+        else:
+            return False
+    def calcularDesviacionEstandar(self):
+        if len(self.precios) > 0:
+            self.desviacionEstandar = (sum([(x - self.precioPromedio) ** 2 for x in self.precios]) / len(self.precios)) ** 0.5
             return True
         else:
             return False
@@ -93,8 +109,22 @@ class ScrapingML:
                 "Imagen": "",
                 "Descripcion": ""
             }])
+            df_precio_mediana = pd.DataFrame([{
+                "Nombre": "Mediana",
+                "Precio": self.mediana,
+                "Enlace": "",
+                "Imagen": "",
+                "Descripcion": ""
+            }])
+            df_desviacion_estandar = pd.DataFrame([{
+                "Nombre": "Desviación estándar",
+                "Precio": self.desviacionEstandar,
+                "Enlace": "",
+                "Imagen": "",
+                "Descripcion": ""
+            }])
             # Concatenar el DataFrame original con el del precio promedio
-            df = pd.concat([df, df_precio_promedio], ignore_index=True)
+            df = pd.concat([df, df_precio_promedio, df_precio_mediana, df_desviacion_estandar], ignore_index=True)
             df.to_excel(f"./Archivos_Generados/Excel/{self.tituloBusqueda.replace(" ", "_")}.xlsx", index=False)
             return True
         else:
@@ -105,7 +135,9 @@ class ScrapingML:
                 json.dump({
                     "Titulo de la busqueda": self.tituloBusqueda,
                     "Datos": self.data,
-                    "Precio promedio": self.precioPromedio
+                    "Precio promedio": self.precioPromedio,
+                    "Mediana": self.mediana,
+                    "desviacion estandar": self.desviacionEstandar
                 }, file, ensure_ascii=False, indent=4)
             return True
         else:
@@ -127,6 +159,8 @@ class ScrapingML:
             plt.figure(figsize=(20, 10))
             plt.bar([producto["Nombre"][:15] for producto in self.productosSeleccionados], [float(producto["Precio"].replace(",", "")) for producto in self.productosSeleccionados], color="skyblue", label="Precio")
             plt.axhline(y=self.precioPromedio, color='r', linestyle='-', label=f"Precio promedio: ${self.precioPromedio}")
+            plt.axhline(y=self.mediana, color='g', linestyle='-', label=f"Mediana: ${self.mediana}")
+            plt.axhline(y=self.desviacionEstandar, color='y', linestyle='--', label=f"Desviación estándar: ${self.desviacionEstandar}")
             plt.xticks(rotation=90)
             plt.xlabel("Productos")
             plt.ylabel("Precio")
