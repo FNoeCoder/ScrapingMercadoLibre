@@ -26,21 +26,3 @@ elif opcion == "2":
 print("")
 
 
-# ---------------------- Resultados de la búsqueda
-if scraping.establecerConexion() and scraping.extraerDatos():
-    print(f"🔍: {scraping.getTituloBusqueda()} en Mercadolibre")
-    print(f"🔗: {scraping.getUrl()}")
-    if scraping.datosEncontrados():
-        scraping.graficarPrecios(tipo="todos")
-        print("Gráficas ✅")
-        scraping.guardarDatosExcel()
-        print("Excel ✅")
-        scraping.guardarDatosJSON()
-        print("JSON ✅")
-
-    else:
-        print("❌: No se encontraron datos en la búsqueda de MercadoLibre")
-else:
-    print("❌: No se pudo establecer conexión con MercadoLibre")
-print("")
-

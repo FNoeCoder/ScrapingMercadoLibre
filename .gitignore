@@ -167,3 +167,4 @@ cython_debug/
 Archivos_Generados/Excel/*
 Archivos_Generados/IMG/*
 Archivos_Generados/JSON/*
+*.json
